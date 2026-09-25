@@ -68,9 +68,20 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         self.info
 
         # Get the version of the service.
-        self.syngine_service_version = self._download_url(
-            self._get_url(path="version")
-        )
+        try:
+            self.syngine_service_version = self._download_url(
+                self._get_url(path="version")
+            )
+        except InstaseisError as syngine_version_retrieval_error:
+            self.syngine_service_version = "unknown"
+            warnings.warn(
+                "Instaseis failed to retrieve the Syngine service version due to an error. "
+                "Proceeding without version information. "
+                "Error message: %s"
+                % syngine_version_retrieval_error,
+                UserWarning,
+            )
+            
 
     def _get_seismograms(self, source, receiver, components=("Z", "N", "E")):
         """Extract seismograms.
