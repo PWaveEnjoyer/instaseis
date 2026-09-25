@@ -67,7 +67,9 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         # Download once to make sure it works and the model exists.
         self.info
 
-        # Get the version of the service.
+        # Try to get the Syngine service version if available.
+        # Robust try/except block makes sure everything doesnt stop
+        # if version unavailable.
         try:
             self.syngine_service_version = self._download_url(
                 self._get_url(path="version")
@@ -75,11 +77,12 @@ class SyngineInstaseisDB(BaseInstaseisDB):
         except InstaseisError as syngine_version_retrieval_error:
             self.syngine_service_version = "unknown"
             warnings.warn(
-                "Instaseis failed to retrieve the Syngine service version due to an error. "
+                "Could not retrieve the Syngine service version. "
                 "Proceeding without version information. "
-                "Error message: %s"
+                "Reason: %s"
                 % syngine_version_retrieval_error,
-                UserWarning,
+                InstaseisWarning,
+                stacklevel = 3,
             )
             
 
